@@ -3,7 +3,6 @@ const app = express();
 const mongoose = require('mongoose');
 const authRoutes = require("./routes/auth.routes");
 
-app.use('/auth', authRoutes);
 
 mongoose.connect(
     "mongodb+srv://admin:12345678iti@cluster0.ix3l1dd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
@@ -16,8 +15,10 @@ mongoose.connect(
 });
 
 app.get('/', (req, res) => {
-  res.send('Hello');
+    res.send('Hello');
 });
+
+app.use('/auth', authRoutes);
 
 app.listen(3000,() => {
     console.log('app is running in port 3000');
