@@ -18,5 +18,10 @@
   "bugs": {
     "url": "https://github.com/o-sallam/ecommerce-api-core-iti/issues"
   },
-  "homepage": "https://github.com/o-sallam/ecommerce-api-core-iti#readme"
+  "homepage": "https://github.com/o-sallam/ecommerce-api-core-iti#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "mongoose": "^8.15.1",
+    "nodemon": "^3.1.10"
+  }
 }
