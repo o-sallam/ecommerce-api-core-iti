@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const authRoutes = require("./routes/auth.routes");
+const productRoutes=require('./routes/products.routes');
 
 
 mongoose.connect(
@@ -23,3 +24,7 @@ app.use('/auth', authRoutes);
 app.listen(3000,() => {
     console.log('app is running in port 3000');
 })
+
+
+//Routes
+app.use('/api/products', productRoutes); 
