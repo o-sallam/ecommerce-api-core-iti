@@ -6,7 +6,7 @@ const createProduct=async(req,res)=>{ //createproduct built in in express
     const data=req.body;             //cause if i want to destructure the data i need to get from the body of the request // ex:{name}
     try{
         const newProduct=new product(data);
-        await newProduct.save(); //save built in func to save the product to the database 
+        await newProduct.save();      //save built in func to save the product to the database 
         res.status(201).json(newProduct);
     }
  catch(err){

@@ -5,7 +5,7 @@ const authRoutes = require("./routes/auth.routes");
 const productRoutes=require('./routes/products.routes');
 
 
-
+app.use(express.json());
 
 mongoose.connect(
     "mongodb+srv://admin:12345678iti@cluster0.ix3l1dd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
