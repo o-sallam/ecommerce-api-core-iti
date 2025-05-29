@@ -5,6 +5,8 @@ const authRoutes = require("./routes/auth.routes");
 const productRoutes=require('./routes/products.routes');
 
 
+
+
 mongoose.connect(
     "mongodb+srv://admin:12345678iti@cluster0.ix3l1dd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 )
@@ -19,12 +21,13 @@ app.get('/', (req, res) => {
     res.send('Hello');
 });
 
+//Routes
 app.use('/auth', authRoutes);
+
+app.use('/products', productRoutes); 
 
 app.listen(3000,() => {
     console.log('app is running in port 3000');
 })
 
 
-//Routes
-app.use('/api/products', productRoutes); 
