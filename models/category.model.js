@@ -10,7 +10,11 @@ const categorySchema = new mongoose.Schema({
   description: {
     type: String,
     default: ''
-  }
+  },
+  products: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'product'
+  }]
 });
 
 module.exports = mongoose.model('Category', categorySchema)
