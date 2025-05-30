@@ -2,6 +2,9 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const authRoutes = require("./routes/auth.routes");
+const productRoutes=require('./routes/products.routes');
+const categoryRoutes = require('./routes/categories.routes');
+
 
 mongoose.connect(
     "mongodb+srv://admin:12345678iti@cluster0.ix3l1dd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
@@ -13,14 +16,21 @@ mongoose.connect(
     console.log(" MongoDB connection error", err)
 });
 
+app.use(express.json());
+
 app.get('/', (req, res) => {
     res.send('Hello');
 });
 
+//Routes
 app.use('/auth', authRoutes);
 
-  res.send('Hello');
-});
+app.use('/products', productRoutes);
+
+app.use('/categories', categoryRoutes);
+
+
 app.listen(3000,() => {
     console.log('app is running in port 3000');
 })
+
