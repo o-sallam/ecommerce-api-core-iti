@@ -6,6 +6,13 @@ const productRoutes=require('./routes/products.routes');
 const cartRoutes=require('./routes/cart.routes');
 const paymentRoutes=require('./routes/payment.routes');
 mongoose.connect(
+const productRoutes = require("./routes/products.routes");
+const categoryRoutes = require("./routes/categories.routes");
+const cors = require('cors');
+
+mongoose
+  .connect(
+
     "mongodb+srv://admin:12345678iti@cluster0.ix3l1dd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
   )
   .then(() => {
@@ -24,6 +31,9 @@ app.get("/", (req, res) => {
 });
 
 //Routes
+
+app.use(cors());
+
 app.use("/auth", authRoutes);
 app.use('/products', productRoutes); 
 app.use('/cart', cartRoutes); 
@@ -39,3 +49,4 @@ app.use("/products", productRoutes);
 app.listen(3000, () => {
   console.log("app is running in port 3000");
 });
+
