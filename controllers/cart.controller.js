@@ -25,15 +25,19 @@ const addToCart = async (req, res) => {
 };
 
 
-const displayProducts = (req, res) => {
-  res.json({ cart: req.session.cart || [] });
+  const displayProducts = async (req, res) => {
+    try {
+    const data = await Cart.find(); 
+    res.json(data.cart);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
 };
 
 
 const editItem =async (req, res) => {
   const { productId } = req.params;
   const { quantity } = req.body;
-
   try {
     const updatedItem = await Cart.findByIdAndUpdate(
       productId,
@@ -48,14 +52,12 @@ const editItem =async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
-
 const deleteItem = (req, res) => {
   const productId = req.body.productId;
   const cart = req.session.cart;
   cart = cart.filter((item) => item.productId !== productId);
   res.send({ success: true, cart: cart });
 };
-
 module.exports = {
   addToCart,
   displayProducts,

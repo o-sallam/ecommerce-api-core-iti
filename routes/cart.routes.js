@@ -1,10 +1,10 @@
 const cartController=require('../controllers/cart.controller');
 const express=require('express');
 const router=express.Router();
-router.get("/",cartController.displayProducts)
-router.post("/",cartController.addToCart)
-router.put("/:id",cartController.editItem)
-router.delete("/:id",cartController.deleteItem)
+router.get("/disproduct",cartController.displayProducts)
+router.post("/add",cartController.addToCart)
+router.put("/edit/:id",cartController.editItem)
+router.delete("delete/:id",cartController.deleteItem)
 
 
 module.exports=router;
