@@ -23,6 +23,7 @@
   "homepage": "https://github.com/o-sallam/ecommerce-api-core-iti#readme",
   "dependencies": {
     "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
     "ecommerce-api-core-iti": "file:",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",

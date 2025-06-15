@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const authRoutes = require("./routes/auth.routes");
 const productRoutes = require("./routes/products.routes");
 const categoryRoutes = require("./routes/categories.routes");
+const cors = require('cors');
 
 mongoose
   .connect(
@@ -23,6 +24,9 @@ app.get("/", (req, res) => {
 });
 
 //Routes
+
+app.use(cors());
+
 app.use("/auth", authRoutes);
 
 app.use("/products", productRoutes);
@@ -32,3 +36,4 @@ app.use("/categories", categoryRoutes);
 app.listen(3000, () => {
   console.log("app is running in port 3000");
 });
+
