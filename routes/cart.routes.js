@@ -1,6 +1,7 @@
-const cartController = require("../controllers/cart.controller");
-const express = require("express");
-const router = express.Router();
+const cartController=require('../controllers/cart.controller');
+const express=require('express');
+const router=express.Router();
+
 router.get("/", cartController.getCarts);
 router.get("/disproduct", cartController.displayProducts);
 router.post("/add", cartController.addToCart);
