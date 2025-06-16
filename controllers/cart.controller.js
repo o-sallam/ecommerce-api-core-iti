@@ -24,18 +24,25 @@ const addToCart = async (req, res) => {
   }
 };
 
-
-  const displayProducts = async (req, res) => {
-    try {
-    const data = await Cart.find(); 
+const getCarts = async (req, res) => {
+  try {
+    const data = await Cart.find();
     res.json(data.cart);
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: "Server error" });
   }
 };
 
+const displayProducts = async (req, res) => {
+  try {
+    const data = await Cart.find();
+    res.json(data.cart);
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
 
-const editItem =async (req, res) => {
+const editItem = async (req, res) => {
   const { productId } = req.params;
   const { quantity } = req.body;
   try {
@@ -63,4 +70,5 @@ module.exports = {
   displayProducts,
   editItem,
   deleteItem,
+  getCarts,
 };
