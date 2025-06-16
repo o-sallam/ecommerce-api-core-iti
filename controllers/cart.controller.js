@@ -24,23 +24,24 @@ const addToCart = async (req, res) => {
   }
 };
 
-
-  const displayProducts = async (req, res) => {
-    try {
-    const data = await Cart.find(); 
-    res.json(data.cart);
+const displayProducts = async (req, res) => {
+try {
+    const userId = req.query.userId;
+    const cartItems = await Cart.find({ userId });
+    res.json(cartItems);
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
 };
 
 
-const editItem =async (req, res) => {
+
+const editItem = async (req, res) => {
   const { productId } = req.params;
-  const { quantity } = req.body;
+  const { quantity, userId } = req.body;
   try {
-    const updatedItem = await Cart.findByIdAndUpdate(
-      productId,
+    const updatedItem = await Cart.findOneAndUpdate(
+      { userId, productId },
       { $set: { quantity } },
       { new: true }
     );
@@ -52,12 +53,19 @@ const editItem =async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
-const deleteItem = (req, res) => {
-  const productId = req.body.productId;
-  const cart = req.session.cart;
-  cart = cart.filter((item) => item.productId !== productId);
-  res.send({ success: true, cart: cart });
+
+
+const deleteItem = async(req, res) => {
+  try {
+    const { productId, userId } = req.body;
+    await Cart.deleteOne({ productId, userId });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
 };
+
+
 module.exports = {
   addToCart,
   displayProducts,
