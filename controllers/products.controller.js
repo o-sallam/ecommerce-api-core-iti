@@ -40,6 +40,37 @@ const getAllProducts = async (req, res) => {
     }
 };
 
+//adding bulk products
+const addBulkProducts = async (req, res) => {
+    try{
+    const productsArray = req.body.products;  //get the products array from the request body
+    const processedProducts=[];               //array to hold the processed products before saving them to the database
+    for (let item of productsArray){
+        let category = await Category.findOne({name: item.categoryName}); //find the category by name
+        if(!category){                                           //if the category does not exist, create it
+             category = await Category.create({ name: item.categoryName });
+        }
+        const newProduct = new product({           //create a new product object
+        name: item.name,
+        price: item.price,
+        image: item.image,
+        description: item.description,
+        inStock: item.inStock ?? true,
+        category: category._id
+        });
+        processedProducts.push(newProduct);        //push the new product to the processed products array
+
+    }
+    await product.insertMany(processedProducts);    //insertMany built in func to insert multiple products at once
+    res.status(201).json({ message: "Products added successfully", count: processedProducts.length });
+
+    }
+    catch(err){
+        console.error(err);
+        res.status(500).json({ message: "Error adding products", error: err.message });
+    }
+}
+
 //get a single product by id  for product details page
 const getSingleProduct = async (req, res) => {
     try {
@@ -91,12 +122,14 @@ const deleteProduct = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 
-}
+} 
+
 
 module.exports = {
     createProduct,
     getAllProducts,
     getSingleProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    addBulkProducts
 }
