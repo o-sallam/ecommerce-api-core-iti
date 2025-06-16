@@ -24,16 +24,28 @@ const addToCart = async (req, res) => {
   }
 };
 
+
+const getCarts = async (req, res) => {
+  try {
+    const data = await Cart.find();
+    res.json(data.cart);
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+}
+
+
 const displayProducts = async (req, res) => {
-try {
+  try {
     const userId = req.query.userId;
     const cartItems = await Cart.find({ userId });
-    res.json(cartItems);
+     res.json(cartItems);
+    // const data = await Cart.find();
+    // res.json(data.cart);
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: "Server error" });
   }
 };
-
 
 
 const editItem = async (req, res) => {
@@ -71,4 +83,5 @@ module.exports = {
   displayProducts,
   editItem,
   deleteItem,
+  getCarts,
 };
