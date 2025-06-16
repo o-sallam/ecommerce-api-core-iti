@@ -4,9 +4,8 @@ const mongoose = require("mongoose");
 const authRoutes = require("./routes/auth.routes");
 const productRoutes=require('./routes/products.routes');
 const cartRoutes=require('./routes/cart.routes');
-const paymentRoutes=require('./routes/payment.routes');
-mongoose.connect(
-const productRoutes = require("./routes/products.routes");
+//const paymentRoutes=require('./routes/payment.routes');
+
 const categoryRoutes = require("./routes/categories.routes");
 const cors = require('cors');
 
@@ -26,9 +25,7 @@ app.use(express.json());
 app.get('/', (req, res) => {
     res.send('Hello');
 });
-app.get("/", (req, res) => {
-  res.send("Hello");
-});
+
 
 //Routes
 
@@ -37,14 +34,12 @@ app.use(cors());
 app.use("/auth", authRoutes);
 app.use('/products', productRoutes); 
 app.use('/cart', cartRoutes); 
-app.use('/payment', paymentRoutes);
+// app.use('/payment', paymentRoutes);
 
 
-app.listen(3000,() => {
-    console.log('app is running in port 3000');
-})
-app.use("/products", productRoutes);
-// app.use("/categories", categoryRoutes);
+
+
+ app.use("/categories", categoryRoutes);
 
 app.listen(3000, () => {
   console.log("app is running in port 3000");
