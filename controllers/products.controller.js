@@ -44,7 +44,9 @@ const addBulkProducts = async (req, res) => {
       // Resolve the category ObjectId. Client can send `category` as an id or `categoryName` as a string
       let categoryId = item.category;
       if (!categoryId && item.categoryName) {
-        const categoryDoc = await Category.findOne({ name: item.categoryName.trim() });
+        const categoryDoc = await Category.findOne({
+          name: item.categoryName.trim(),
+        });
         if (!categoryDoc) {
           return res
             .status(400)
@@ -60,7 +62,9 @@ const addBulkProducts = async (req, res) => {
         category: categoryId,
         images: item.images,
         // Use explicit thumbnail if provided, otherwise default to first image
-        thumbnail: item.thumbnail || (item.images && item.images.length ? item.images[0] : undefined),
+        thumbnail:
+          item.thumbnail ||
+          (item.images && item.images.length ? item.images[0] : undefined),
         featured: !!item.featured,
         quantity: item.quantity,
       };
@@ -69,7 +73,9 @@ const addBulkProducts = async (req, res) => {
     }
 
     // Insert all documents at once. `ordered:false` means it will continue on validation errors of individual docs
-    const createdProducts = await product.insertMany(processedProducts, { ordered: false });
+    const createdProducts = await product.insertMany(processedProducts, {
+      ordered: false,
+    });
 
     res.status(201).json({
       message: "Products added successfully",
@@ -78,10 +84,11 @@ const addBulkProducts = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Error adding products", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Error adding products", error: err.message });
   }
 };
-
 
 //==================================================
 // READ
@@ -157,7 +164,6 @@ const getRelatedProducts = async (req, res) => {
   }
 };
 
-
 //==================================================
 // UPDATE
 //==================================================
@@ -195,7 +201,12 @@ const updateBulkProducts = async (req, res) => {
 
     const updatedProducts = await Promise.all(updatePromises);
 
-    res.status(200).json({ message: "Products updated successfully", products: updatedProducts });
+    res
+      .status(200)
+      .json({
+        message: "Products updated successfully",
+        products: updatedProducts,
+      });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -209,15 +220,15 @@ const updateAllProductImages = async (req, res) => {
       return res.status(404).json({ message: "No products found to update." });
     }
 
-    const bulkOps = allProducts.map(p => {
-      const imageName = p.name.replace(/\s+/g, '_').toLowerCase() + '.webp';
-      const newImagePath = `app/assets/images/products-images/${imageName}`;
+    const bulkOps = allProducts.map((p) => {
+      const imageName = p.name.replace(/\s+/g, "_").toLowerCase() + ".webp";
+      const newImagePath = `assets/images/products-images/${imageName}`;
       return {
         updateOne: {
           filter: { _id: p._id },
           // Set the images array to contain only the new path, and update the thumbnail
-          update: { $set: { images: [newImagePath], thumbnail: newImagePath } }
-        }
+          update: { $set: { images: [newImagePath], thumbnail: newImagePath } },
+        },
       };
     });
 
@@ -225,14 +236,15 @@ const updateAllProductImages = async (req, res) => {
 
     res.status(200).json({
       message: "All product images updated successfully.",
-      modifiedCount: result.modifiedCount
+      modifiedCount: result.modifiedCount,
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Error updating product images", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Error updating product images", error: err.message });
   }
 };
-
 
 //==================================================
 // DELETE
@@ -260,7 +272,6 @@ const deleteAllProducts = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
 
 module.exports = {
   // CREATE
