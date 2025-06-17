@@ -1,23 +1,49 @@
 const Cart = require("../models/cart.model");
 
-const addToCart = async (req, res) => {
+const increaseQuantity = async (req, res) => {
   try {
-    const { userId, productId, quantity } = req.body;
-    const existingItem = await Cart.findOne({ userId, productId });
-    if (existingItem) {
-      existingItem.quantity += quantity;
-      existingItem.timeStamp = Date.now();
-      await existingItem.save();
-      return res.json({ message: "Add more of the item", cart: existingItem });
+    const { userId, productId } = req.body;
+    let cartItem = await Cart.findOne({ userId, productId });
+
+    if (cartItem) {
+      cartItem.quantity += 1;
+      cartItem.timeStamp = Date.now();
+    } else {
+      cartItem = new Cart({
+        userId,
+        productId,
+        quantity: 1,
+        timeStamp: Date.now(),
+      });
     }
-    const newCartItem = new Cart({
-      userId,
-      productId,
-      quantity,
-      timeStamp: Date.now(),
-    });
-    await newCartItem.save();
-    res.status(201).json({ message: "Item added to cart", cart: newCartItem });
+
+    await cartItem.save();
+    res.status(200).json({ message: "Cart updated successfully", cart: cartItem });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+const decreaseQuantity = async (req, res) => {
+  try {
+    const { userId, productId } = req.body;
+    let cartItem = await Cart.findOne({ userId, productId });
+
+    if (cartItem) {
+      cartItem.quantity -= 1;
+
+      if (cartItem.quantity > 0) {
+        cartItem.timeStamp = Date.now();
+        await cartItem.save();
+        res.status(200).json({ message: "Item quantity decreased", cart: cartItem });
+      } else {
+        await Cart.findByIdAndDelete(cartItem._id);
+        res.status(200).json({ message: "Item removed from cart" });
+      }
+    } else {
+      res.status(404).json({ message: "Item not found in cart" });
+    }
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
@@ -90,7 +116,8 @@ const deleteAllItems = async (req, res) => {
 };
 
 module.exports = {
-  addToCart,
+  increaseQuantity,
+  decreaseQuantity,
   displayProducts,
   editItem,
   deleteItem,
