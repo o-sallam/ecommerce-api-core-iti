@@ -163,6 +163,29 @@ const deleteAllProducts = async (req, res) => {
   }
 };
 
+const getRelatedProducts = async (req, res) => {
+  try {
+    const currentProductId = req.params.id;
+    const currentProduct = await product.findById(currentProductId);
+
+    if (!currentProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    const relatedProducts = await product
+      .find({
+        category: currentProduct.category,
+        _id: { $ne: currentProductId },
+      })
+      .sort({ sold: -1 })
+      .limit(4);
+
+    res.status(200).json(relatedProducts);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 module.exports = {
   createProduct,
   getAllProducts,
@@ -172,4 +195,5 @@ module.exports = {
   addBulkProducts,
   deleteAllProducts,
   getFueaturedProducts,
+  getRelatedProducts,
 };
