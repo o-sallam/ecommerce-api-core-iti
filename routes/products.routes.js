@@ -12,6 +12,6 @@ router.delete("/", productController.deleteAllProducts);
 router.post("/bulk", productController.addBulkProducts);
 router.put("/bulk", productController.updateBulkProducts);
 router.put("/images/update-all", productController.updateAllProductImages);
-router.get("/featured", productController.getFueaturedProducts);
+router.get("/featured", productController.getFeaturedProducts);
 
 module.exports = router;

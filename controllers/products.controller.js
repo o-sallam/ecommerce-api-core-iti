@@ -215,7 +215,8 @@ const updateAllProductImages = async (req, res) => {
       return {
         updateOne: {
           filter: { _id: p._id },
-          update: { $set: { image: newImagePath } }
+          // Set the images array to contain only the new path, and update the thumbnail
+          update: { $set: { images: [newImagePath], thumbnail: newImagePath } }
         }
       };
     });
