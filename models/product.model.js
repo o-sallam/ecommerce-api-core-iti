@@ -39,10 +39,7 @@ const productSchema = new mongoose.Schema(
         required: [true, "At least one product image is required"],
       },
     ],
-    shipping: {
-      type: Boolean,
-      default: true,
-    },
+
     ratings: [
       {
         star: Number,
