@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 // Route to display a map of all available endpoints
-app.get("/", (req, res) => {
+app.get("/", (_, res) => {
   res.status(200).json(endpointMap);
 });
 
