@@ -1,8 +1,11 @@
 const product = require("../models/product.model");
 const Category = require("../models/category.model");
 
-//create new product "for admins"
+//==================================================
+// CREATE
+//==================================================
 
+// Create new product "for admins"
 const createProduct = async (req, res) => {
   //createproduct built in in express
   const { name, price, image, description, categoryName } = req.body; //cause if i want to destructure the data i need to get from the body of the request // ex:{name}
@@ -26,31 +29,7 @@ const createProduct = async (req, res) => {
   }
 };
 
-//get all products
-const getAllProducts = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page); //pagination //get the page number from the query string
-    const capacity = 6; //how many products per page
-    const productList = await product
-      .find()
-      .skip((page - 1) * capacity)
-      .limit(capacity); //find built in func to get all products
-    res.status(200).json(productList);
-  } catch (err) {
-    res.status(500).json({ message: err.message }); //500 status code for internal server error
-  }
-};
-
-const getFueaturedProducts = async (req, res) => {
-  try {
-    const featuredProducts = await product.find({ featured: true });
-    res.status(200).json(featuredProducts);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
-// adding bulk products (admins)
+// Adding bulk products (admins)
 const addBulkProducts = async (req, res) => {
   try {
     // Accept either an array in the body directly **or** under `products`
@@ -103,7 +82,32 @@ const addBulkProducts = async (req, res) => {
   }
 };
 
-//get a single product by id  for product details page
+
+//==================================================
+// READ
+//==================================================
+
+// Get all products
+const getAllProducts = async (req, res) => {
+  try {
+    let productList;
+    if (req.query.page) {
+      const page = parseInt(req.query.page);
+      const capacity = 6; //how many products per page
+      productList = await product
+        .find()
+        .skip((page - 1) * capacity)
+        .limit(capacity);
+    } else {
+      productList = await product.find();
+    }
+    res.status(200).json(productList);
+  } catch (err) {
+    res.status(500).json({ message: err.message }); //500 status code for internal server error
+  }
+};
+
+// Get a single product by id for product details page
 const getSingleProduct = async (req, res) => {
   try {
     const id = req.params.id; //get the id from the request params
@@ -121,43 +125,10 @@ const getSingleProduct = async (req, res) => {
   }
 };
 
-//update product by id
-
-const updateProduct = async (req, res) => {
-  const id = req.params.id; //req.params is an object in Express.js that contains route parameters extracted from the URL of the incoming HTTP request.
-  const data = req.body;
+const getFeaturedProducts = async (req, res) => {
   try {
-    const updatedProduct = await product.findByIdAndUpdate(id, data, {
-      new: true,
-      runValidators: true,
-    }); //new:true means return the updated data, runValidators:true means run the validators defined in the schema
-    if (!updatedProduct) {
-      return res.status(404).json({ message: "product not found" });
-    }
-    res.status(200).json({ message: "product updated successfully" });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
-//delete product by id
-const deleteProduct = async (req, res) => {
-  const id = req.params.id;
-  try {
-    const deletedProduct = await product.findByIdAndDelete(id);
-    if (!deletedProduct) {
-      return res.status(404).json({ message: "product not found" });
-    }
-    res.status(200).json({ message: "product deleted successfully" });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
-const deleteAllProducts = async (req, res) => {
-  try {
-    await product.deleteMany();
-    res.status(200).json({ message: "products deleted successfully" });
+    const featuredProducts = await product.find({ featured: true });
+    res.status(200).json(featuredProducts);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -186,14 +157,124 @@ const getRelatedProducts = async (req, res) => {
   }
 };
 
+
+//==================================================
+// UPDATE
+//==================================================
+
+// Update product by id
+const updateProduct = async (req, res) => {
+  const id = req.params.id; //req.params is an object in Express.js that contains route parameters extracted from the URL of the incoming HTTP request.
+  const data = req.body;
+  try {
+    const updatedProduct = await product.findByIdAndUpdate(id, data, {
+      new: true,
+      runValidators: true,
+    }); //new:true means return the updated data, runValidators:true means run the validators defined in the schema
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "product not found" });
+    }
+    res.status(200).json({ message: "product updated successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const updateBulkProducts = async (req, res) => {
+  try {
+    const { products } = req.body;
+
+    if (!products || !Array.isArray(products)) {
+      return res.status(400).json({ message: "Invalid request body" });
+    }
+
+    const updatePromises = products.map(async (p) => {
+      const { _id, ...updateData } = p;
+      return await product.findByIdAndUpdate(_id, updateData, { new: true });
+    });
+
+    const updatedProducts = await Promise.all(updatePromises);
+
+    res.status(200).json({ message: "Products updated successfully", products: updatedProducts });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const updateAllProductImages = async (req, res) => {
+  try {
+    const allProducts = await product.find({});
+
+    if (!allProducts.length) {
+      return res.status(404).json({ message: "No products found to update." });
+    }
+
+    const bulkOps = allProducts.map(p => {
+      const imageName = p.name.replace(/\s+/g, '_').toLowerCase() + '.webp';
+      const newImagePath = `app/assets/images/products-images/${imageName}`;
+      return {
+        updateOne: {
+          filter: { _id: p._id },
+          update: { $set: { image: newImagePath } }
+        }
+      };
+    });
+
+    const result = await product.bulkWrite(bulkOps);
+
+    res.status(200).json({
+      message: "All product images updated successfully.",
+      modifiedCount: result.modifiedCount
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error updating product images", error: err.message });
+  }
+};
+
+
+//==================================================
+// DELETE
+//==================================================
+
+// Delete product by id
+const deleteProduct = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const deletedProduct = await product.findByIdAndDelete(id);
+    if (!deletedProduct) {
+      return res.status(404).json({ message: "product not found" });
+    }
+    res.status(200).json({ message: "product deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const deleteAllProducts = async (req, res) => {
+  try {
+    await product.deleteMany();
+    res.status(200).json({ message: "products deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
 module.exports = {
+  // CREATE
   createProduct,
+  addBulkProducts,
+  // READ
   getAllProducts,
   getSingleProduct,
-  updateProduct,
-  deleteProduct,
-  addBulkProducts,
-  deleteAllProducts,
-  getFueaturedProducts,
+  getFeaturedProducts,
   getRelatedProducts,
+  // UPDATE
+  updateProduct,
+  updateBulkProducts,
+  updateAllProductImages,
+  // DELETE
+  deleteProduct,
+  deleteAllProducts,
 };
