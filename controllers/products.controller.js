@@ -56,19 +56,16 @@ const addBulkProducts = async (req, res) => {
     const productsArray = req.body.products; //get the products array from the request body
     const processedProducts = []; //array to hold the processed products before saving them to the database
     for (let item of productsArray) {
-      let category = await Category.findOne({ name: item.categoryName }); //find the category by name
-      if (!category) {
-        //if the category does not exist, create it
-        category = await Category.create({ name: item.categoryName });
-      }
       const newProduct = new product({
         //create a new product object
         name: item.name,
         price: item.price,
-        image: item.image,
         description: item.description,
-        inStock: item.inStock ?? true,
-        category: category._id,
+        inStock: item.quantity > 0,
+        category: item.category,
+        images: item.images,
+        featured: item.featured,
+        quantity: item.quantity,
       });
       processedProducts.push(newProduct); //push the new product to the processed products array
     }
