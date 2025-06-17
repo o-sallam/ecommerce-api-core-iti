@@ -1,4 +1,4 @@
-const product = require("../models/products.models");
+const product = require("../models/product.model");
 const Category = require("../models/category.model");
 
 //create new product "for admins"
