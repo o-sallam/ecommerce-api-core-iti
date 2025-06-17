@@ -39,6 +39,10 @@ const productSchema = new mongoose.Schema(
         required: [true, "At least one product image is required"],
       },
     ],
+    thumbnail: {
+      type: String,
+      required: [true, "Thumbnail image is required"],
+    },
 
     ratings: [
       {

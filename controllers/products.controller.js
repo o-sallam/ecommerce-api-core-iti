@@ -50,35 +50,56 @@ const getFueaturedProducts = async (req, res) => {
   }
 };
 
-//adding bulk products
+// adding bulk products (admins)
 const addBulkProducts = async (req, res) => {
   try {
-    const productsArray = req.body.products; //get the products array from the request body
-    const processedProducts = []; //array to hold the processed products before saving them to the database
-    for (let item of productsArray) {
-      const newProduct = new product({
-        //create a new product object
+    // Accept either an array in the body directly **or** under `products`
+    const payload = Array.isArray(req.body) ? req.body : req.body.products;
+
+    if (!payload || !payload.length) {
+      return res.status(400).json({ message: "No products provided" });
+    }
+
+    const processedProducts = [];
+    for (const item of payload) {
+      // Resolve the category ObjectId. Client can send `category` as an id or `categoryName` as a string
+      let categoryId = item.category;
+      if (!categoryId && item.categoryName) {
+        const categoryDoc = await Category.findOne({ name: item.categoryName.trim() });
+        if (!categoryDoc) {
+          return res
+            .status(400)
+            .json({ message: `Category '${item.categoryName}' not found` });
+        }
+        categoryId = categoryDoc._id;
+      }
+
+      const productDoc = {
         name: item.name,
         price: item.price,
         description: item.description,
-        inStock: item.quantity > 0,
-        category: item.category,
+        category: categoryId,
         images: item.images,
-        featured: item.featured,
+        // Use explicit thumbnail if provided, otherwise default to first image
+        thumbnail: item.thumbnail || (item.images && item.images.length ? item.images[0] : undefined),
+        featured: !!item.featured,
         quantity: item.quantity,
-      });
-      processedProducts.push(newProduct); //push the new product to the processed products array
+      };
+
+      processedProducts.push(productDoc);
     }
-    await product.insertMany(processedProducts); //insertMany built in func to insert multiple products at once
+
+    // Insert all documents at once. `ordered:false` means it will continue on validation errors of individual docs
+    const createdProducts = await product.insertMany(processedProducts, { ordered: false });
+
     res.status(201).json({
       message: "Products added successfully",
-      count: processedProducts.length,
+      count: createdProducts.length,
+      products: createdProducts,
     });
   } catch (err) {
     console.error(err);
-    res
-      .status(500)
-      .json({ message: "Error adding products", error: err.message });
+    res.status(500).json({ message: "Error adding products", error: err.message });
   }
 };
 
