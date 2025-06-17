@@ -41,6 +41,15 @@ const getAllProducts = async (req, res) => {
   }
 };
 
+const getFueaturedProducts = async (req, res) => {
+  try {
+    const featuredProducts = await product.find({ featured: true });
+    res.status(200).json(featuredProducts);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 //adding bulk products
 const addBulkProducts = async (req, res) => {
   try {
@@ -144,4 +153,5 @@ module.exports = {
   deleteProduct,
   addBulkProducts,
   deleteAllProducts,
+  getFueaturedProducts,
 };

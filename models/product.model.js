@@ -8,12 +8,6 @@ const productSchema = new mongoose.Schema(
       trim: true,
       maxlength: [100, "Product name cannot exceed 100 characters"],
     },
-    slug: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-    },
     description: {
       type: String,
       required: [true, "Product description is required"],
@@ -30,12 +24,6 @@ const productSchema = new mongoose.Schema(
       ref: "Category",
       required: [true, "Product category is required"],
     },
-    subcategories: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "SubCategory",
-      },
-    ],
     quantity: {
       type: Number,
       required: [true, "Product quantity is required"],
@@ -70,25 +58,29 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    tags: [String],
   },
   {
     timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
+    toJSON: {
+      virtuals: true,
+      transform(doc, ret) {
+        delete ret.__v;
+        delete ret._id;
+      },
+    },
+    toObject: {
+      virtuals: true,
+      transform(doc, ret) {
+        delete ret.__v;
+        delete ret._id;
+      },
+    },
   }
 );
-
-// Virtual for product URL
-productSchema.virtual("url").get(function () {
-  return `/products/${this.slug}`;
-});
 
 // Index for text search
 productSchema.index({
   name: "text",
-  description: "text",
-  tags: "text",
 });
 
 module.exports = mongoose.model("Product", productSchema);
