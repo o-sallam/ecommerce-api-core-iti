@@ -10,6 +10,7 @@ const productRoutes = require("./routes/products.routes");
 const cartRoutes = require("./routes/cart.routes");
 const categoryRoutes = require("./routes/categories.routes");
 const endpointMap = require("./utils/endpointMap");
+const authenticateToken = require("./controllers/auth.middleware");
 
 // Ensure DB is connected for every serverless invocation
 connectDB();
@@ -31,10 +32,10 @@ app.get("/", (_, res) => {
 });
 
 app.use("/auth", authRoutes);
-app.use("/users", userRoutes);
-app.use("/products", productRoutes);
-app.use("/cart", cartRoutes);
-app.use("/categories", categoryRoutes);
+app.use("/users", authenticateToken, userRoutes);
+app.use("/products", authenticateToken, productRoutes);
+app.use("/cart", authenticateToken, cartRoutes);
+app.use("/categories", authenticateToken, categoryRoutes);
 
 // Export for Vercel serverless
 module.exports = app;

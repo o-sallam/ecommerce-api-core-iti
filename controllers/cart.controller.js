@@ -1,5 +1,4 @@
 const Cart = require("../models/cart.model");
-const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
 
 const increaseQuantity = async (req, res) => {
@@ -134,16 +133,11 @@ const getCarts = async (req, res) => {
 
 const getCartByUserId = async (req, res) => {
   try {
-    const authHeader =
-      req.header("Authorization") || req.header("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({ error: "No token provided" });
-    }
-    console.log(authHeader);
-    const token = authHeader.replace("Bearer ", "");
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id;
-    const cart = await Cart.findOne({ user: userId }).populate('items.productId');
+    // req.user is set by the authenticateToken middleware
+    const userId = req.user.id;
+    const cart = await Cart.findOne({ user: userId }).populate(
+      "items.productId"
+    );
     if (!cart) return res.status(404).json({ message: "Cart not found" });
     const cartObj = cart.toObject();
     cartObj.id = cartObj._id;
@@ -151,9 +145,9 @@ const getCartByUserId = async (req, res) => {
     // Move id to end of object for response
     const { id, ...rest } = cartObj;
     // Ensure productId is full product object in each item
-    rest.items = rest.items.map(item => ({
+    rest.items = rest.items.map((item) => ({
       ...item,
-      productId: item.productId
+      productId: item.productId,
     }));
     res.json({ ...rest, id });
   } catch (err) {
@@ -194,19 +188,89 @@ const editItem = async (req, res) => {
 
 const deleteItem = async (req, res) => {
   try {
-    const { productId, userId } = req.body;
-    await Cart.deleteOne({ productId, userId });
-    res.json({ success: true });
+    const { productId } = req.body;
+    const userId = req.user.id;
+    if (!productId) {
+      return res.status(400).json({ error: "productId is required" });
+    }
+    // Find the user's cart
+    const cart = await Cart.findOne({ user: userId });
+    if (!cart) {
+      return res.status(404).json({ error: "Cart not found" });
+    }
+    // Find the item index
+    const itemIndex = cart.items.findIndex(
+      (item) => item.productId.toString() === productId
+    );
+    if (itemIndex === -1) {
+      return res.status(404).json({ error: "Item not found in cart" });
+    }
+    // Remove the item
+    cart.items.splice(itemIndex, 1);
+    // Update totals
+    cart.total = cart.items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+    cart.totalItems = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+    await cart.save();
+    res.json({ success: true, cart });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 };
 
 const deleteAllItems = async (req, res) => {
   try {
-    await Cart.deleteMany();
-    res.json({ success: true });
+    const userId = req.user.id;
+    const cart = await Cart.findOne({ user: userId });
+    if (!cart) {
+      return res.status(404).json({ error: "Cart not found" });
+    }
+    cart.items = [];
+    cart.total = 0;
+    cart.totalItems = 0;
+    await cart.save();
+    res.json({ success: true, cart });
   } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+// New function: Delete item from cart of user from token and productId
+const deleteItemFromUserCart = async (req, res) => {
+  try {
+    const { productId } = req.body;
+    const userId = req.user.id;
+    if (!productId) {
+      return res.status(400).json({ error: "productId is required" });
+    }
+    // Find the user's cart
+    const cart = await Cart.findOne({ user: userId });
+    if (!cart) {
+      return res.status(404).json({ error: "Cart not found" });
+    }
+    // Find the item index
+    const itemIndex = cart.items.findIndex(
+      (item) => item.productId.toString() === productId
+    );
+    if (itemIndex === -1) {
+      return res.status(404).json({ error: "Item not found in cart" });
+    }
+    // Remove the item
+    cart.items.splice(itemIndex, 1);
+    // Update totals
+    cart.total = cart.items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+    cart.totalItems = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+    await cart.save();
+    res.json({ success: true, cart });
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 };
@@ -220,4 +284,5 @@ module.exports = {
   getCarts,
   getCartByUserId,
   deleteAllItems,
+  deleteItemFromUserCart,
 };

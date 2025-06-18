@@ -22,12 +22,12 @@ const endpointMap = {
     "DELETE /products": "Delete all products."
   },
   "Cart": {
-    "GET /cart": "Get all carts.",
-    "GET /cart/me": "Get the authenticated user's cart using the JWT token in the Authorization header.",
-    "POST /cart/increase": "Increase product quantity in cart. Expects JWT token in Authorization header and {productId} in body.",
-    "POST /cart/decrease": "Decrease product quantity in cart. Expects {userId, productId} in body.",
-    "DELETE /cart/delete/:id": "Delete a product from the cart.",
-    "DELETE /cart/deleteAll": "Delete all items from the cart."
+    "GET /cart": "[ADMIN ONLY] Get all carts.",
+    "GET /cart/me": "Get the authenticated user's cart. Requires JWT token in Authorization header as 'Bearer <token>'.",
+    "POST /cart/increase": "Increase product quantity in the authenticated user's cart. Requires JWT token in Authorization header and {productId} in body.",
+    "POST /cart/decrease": "Decrease product quantity in the authenticated user's cart. Requires JWT token in Authorization header and {productId} in body.",
+    "DELETE /cart/item": "Delete a specific item from the authenticated user's cart. Requires JWT token in Authorization header and {productId} in body.",
+    "DELETE /cart/deleteAll": "Delete all items from the authenticated user's cart. Requires JWT token in Authorization header."
   },
   "Categories": {
     "GET /categories": "Get all categories.",
