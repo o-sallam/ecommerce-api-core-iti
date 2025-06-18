@@ -16,7 +16,10 @@ connectDB();
 
 app.use(
   cors({
-    origin: "https://ecommerce-api-core-iti.vercel.app",
+    origin: [
+      "https://ecommerce-api-core-iti.vercel.app",
+      "http://localhost:4200",
+    ],
     credentials: true, // set to true only if you need cookies/auth
   })
 );
