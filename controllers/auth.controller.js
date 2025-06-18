@@ -3,10 +3,15 @@ const Cart = require("../models/cart.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const login = async ({ body: { username, password } }, res) => {
+const login = async ({ body: { username, email, password } }, res) => {
   try {
-    // Find user and populate cart
-    const user = await User.findOne({ username })
+    // Find user by username or email and populate cart
+    const user = await User.findOne({
+      $or: [
+        username ? { username } : {},
+        email ? { email } : {}
+      ]
+    })
       .select("-password") // Exclude password from the result
       .populate("cart", "items total"); // Populate cart details
 
