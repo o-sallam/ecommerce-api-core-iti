@@ -123,10 +123,10 @@ const getSingleProduct = async (req, res) => {
     if (!singleProduct) {
       return res.status(404).json({ message: "product not found" });
     }
-    let { name, price, description, image } = singleProduct; //add the category name to the product object
+    let { name, price, description, images, thumbnail } = singleProduct; //add the category name to the product object
     res
       .status(200)
-      .json({ name, price, description, image, category: category.name }); //if product was found, return it
+      .json({ name, price, description, images, thumbnail, category: category.name }); //if product was found, return it
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
