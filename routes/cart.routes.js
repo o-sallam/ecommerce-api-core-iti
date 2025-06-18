@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 
 router.get("/", cartController.getCarts);
-router.get("/:id", cartController.getCartByUserId);
+router.get("/me", cartController.getCartByUserId);
 router.get("/disproduct", cartController.displayProducts);
 router.post("/increase", cartController.increaseQuantity);
 router.post("/decrease", cartController.decreaseQuantity);

@@ -4,7 +4,8 @@ const User = require("../models/user.model");
 
 const increaseQuantity = async (req, res) => {
   try {
-    const authHeader = req.header("Authorization") || req.header("authorization");
+    const authHeader =
+      req.header("Authorization") || req.header("authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({ error: "No token provided" });
     }
@@ -23,12 +24,12 @@ const increaseQuantity = async (req, res) => {
       // Product not found in DB, add with price 0
       productData = {
         _id: productId,
-        price: 0
+        price: 0,
       };
     } else {
       productData = {
         _id: product._id,
-        price: product.price
+        price: product.price,
       };
     }
 
@@ -39,7 +40,9 @@ const increaseQuantity = async (req, res) => {
     }
 
     // Check if item exists in cart
-    const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
+    const itemIndex = cart.items.findIndex(
+      (item) => item.productId.toString() === productId
+    );
     if (itemIndex > -1) {
       // Increase quantity
       cart.items[itemIndex].quantity += 1;
@@ -48,12 +51,15 @@ const increaseQuantity = async (req, res) => {
       cart.items.push({
         productId: productData._id,
         quantity: 1,
-        price: productData.price
+        price: productData.price,
       });
     }
 
     // Update totals
-    cart.total = cart.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    cart.total = cart.items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
     cart.totalItems = cart.items.reduce((sum, item) => sum + item.quantity, 0);
 
     await cart.save();
@@ -67,7 +73,8 @@ const increaseQuantity = async (req, res) => {
 
 const decreaseQuantity = async (req, res) => {
   try {
-    const authHeader = req.header("Authorization") || req.header("authorization");
+    const authHeader =
+      req.header("Authorization") || req.header("authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({ error: "No token provided" });
     }
@@ -86,7 +93,9 @@ const decreaseQuantity = async (req, res) => {
     }
 
     // Find the item in the cart
-    const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
+    const itemIndex = cart.items.findIndex(
+      (item) => item.productId.toString() === productId
+    );
     if (itemIndex === -1) {
       return res.status(404).json({ error: "Item not found in cart" });
     }
@@ -99,7 +108,10 @@ const decreaseQuantity = async (req, res) => {
     }
 
     // Update totals
-    cart.total = cart.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    cart.total = cart.items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
     cart.totalItems = cart.items.reduce((sum, item) => sum + item.quantity, 0);
 
     await cart.save();
@@ -109,7 +121,7 @@ const decreaseQuantity = async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Server error" });
   }
-}
+};
 
 const getCarts = async (req, res) => {
   try {
@@ -121,10 +133,26 @@ const getCarts = async (req, res) => {
 };
 
 const getCartByUserId = async (req, res) => {
-  const userId = req.params.id;
-  const cart = await Cart.findOne({ user: userId });
-  if (!cart) return res.status(404).json({ message: "Cart not found" });
-  res.json(cart);
+  try {
+    const authHeader =
+      req.header("Authorization") || req.header("authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ error: "No token provided" });
+    }
+    console.log(authHeader);
+    const token = authHeader.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
+    const cart = await Cart.findOne({ user: userId });
+    if (!cart) return res.status(404).json({ message: "Cart not found" });
+    const cartObj = cart.toObject();
+    cartObj.id = cartObj._id;
+    delete cartObj._id;
+    res.json(cartObj);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
 };
 
 const displayProducts = async (req, res) => {
