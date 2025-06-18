@@ -124,9 +124,15 @@ const getSingleProduct = async (req, res) => {
       return res.status(404).json({ message: "product not found" });
     }
     let { name, price, description, images, thumbnail } = singleProduct; //add the category name to the product object
-    res
-      .status(200)
-      .json({ name, price, description, images, thumbnail, category: category.name }); //if product was found, return it
+    res.status(200).json({
+      id,
+      name,
+      price,
+      description,
+      images,
+      thumbnail,
+      category: category.name,
+    }); //if product was found, return it
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -201,12 +207,10 @@ const updateBulkProducts = async (req, res) => {
 
     const updatedProducts = await Promise.all(updatePromises);
 
-    res
-      .status(200)
-      .json({
-        message: "Products updated successfully",
-        products: updatedProducts,
-      });
+    res.status(200).json({
+      message: "Products updated successfully",
+      products: updatedProducts,
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
