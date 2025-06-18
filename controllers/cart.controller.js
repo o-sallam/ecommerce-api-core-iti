@@ -56,7 +56,7 @@ const increaseQuantity = async (req, res) => {
 
     await cart.save();
 
-    res.status(200).json({ cart });
+    res.status(200).json({ message: "ok", total: cart.total, totalItems: cart.totalItems });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
@@ -101,7 +101,7 @@ const decreaseQuantity = async (req, res) => {
 
     await cart.save();
 
-    res.status(200).json({ cart });
+    res.status(200).json({ message: "ok", total: cart.total, totalItems: cart.totalItems });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
