@@ -1,12 +1,10 @@
+// database.js
 require("dotenv").config();
 const mongoose = require("mongoose");
 
 const connectDB = () => {
   mongoose
-    .connect(
-      process.env.MONGO_URI ||
-        "mongodb+srv://admin:12345678iti@cluster0.ix3l1dd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-    )
+    .connect(process.env.MONGO_URI)
     .then(() => {
       console.log("Connected to MongoDB Atlas");
     })

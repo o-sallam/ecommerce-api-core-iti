@@ -1,6 +1,9 @@
+// Vercel/Serverless compatible Express app
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const connectDB = require("./config/database");
 const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
 const productRoutes = require("./routes/products.routes");
@@ -8,7 +11,15 @@ const cartRoutes = require("./routes/cart.routes");
 const categoryRoutes = require("./routes/categories.routes");
 const endpointMap = require("./utils/endpointMap");
 
-app.use(cors());
+// Ensure DB is connected for every serverless invocation
+connectDB();
+
+app.use(
+  cors({
+    origin: "https://ecommerce-api-core-iti.vercel.app",
+    credentials: true, // set to true only if you need cookies/auth
+  })
+);
 app.use(express.json());
 
 // Route to display a map of all available endpoints
@@ -22,4 +33,6 @@ app.use("/products", productRoutes);
 app.use("/cart", cartRoutes);
 app.use("/categories", categoryRoutes);
 
+// Export for Vercel serverless
 module.exports = app;
+module.exports.handler = (req, res) => app(req, res);
