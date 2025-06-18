@@ -4,6 +4,6 @@ const userController = require("../controllers/users.controller");
 const { permit } = require("../middlewares/role.middleware");
 
 // Only 'admin' and 'user' roles can access this endpoint
-router.get("/", permit('admin', 'user'), userController.getUsers);
+router.get("/", userController.getUsers);
 
 module.exports = router;
