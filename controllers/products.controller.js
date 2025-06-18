@@ -283,8 +283,8 @@ module.exports = {
   addBulkProducts,
   // READ
   getAllProducts,
-  getSingleProduct,
   getFeaturedProducts,
+  getSingleProduct,
   getRelatedProducts,
   // UPDATE
   updateProduct,
