@@ -143,12 +143,19 @@ const getCartByUserId = async (req, res) => {
     const token = authHeader.replace("Bearer ", "");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id;
-    const cart = await Cart.findOne({ user: userId });
+    const cart = await Cart.findOne({ user: userId }).populate('items.productId');
     if (!cart) return res.status(404).json({ message: "Cart not found" });
     const cartObj = cart.toObject();
     cartObj.id = cartObj._id;
     delete cartObj._id;
-    res.json(cartObj);
+    // Move id to end of object for response
+    const { id, ...rest } = cartObj;
+    // Ensure productId is full product object in each item
+    rest.items = rest.items.map(item => ({
+      ...item,
+      productId: item.productId
+    }));
+    res.json({ ...rest, id });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
