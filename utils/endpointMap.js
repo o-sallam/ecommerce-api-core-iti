@@ -24,7 +24,7 @@ const endpointMap = {
   "Cart": {
     "GET /cart": "Get all carts.",
     "GET /cart/:id": "Get a single cart by user ID.",
-    "POST /cart/increase": "Increase product quantity in cart. Expects {userId, productId} in body.",
+    "POST /cart/increase": "Increase product quantity in cart. Expects JWT token in Authorization header and {productId} in body.",
     "POST /cart/decrease": "Decrease product quantity in cart. Expects {userId, productId} in body.",
     "DELETE /cart/delete/:id": "Delete a product from the cart.",
     "DELETE /cart/deleteAll": "Delete all items from the cart."
