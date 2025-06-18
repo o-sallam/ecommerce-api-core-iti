@@ -1,23 +1,16 @@
 const Cart = require("../models/cart.model");
-const User = require("../models/user.model");
+const Product = require("../models/product.model");
 
 const increaseQuantity = async (req, res) => {
   try {
-    const authHeader =
-      req.header("Authorization") || req.header("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({ error: "No token provided" });
-    }
-    const token = authHeader.replace("Bearer ", "");
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id;
+    const userId = req.user.id;
     const { productId } = req.body;
     if (!productId) {
       return res.status(400).json({ error: "productId is required" });
     }
 
     // Find product to get price
-    let product = await require("../models/product.model").findById(productId);
+    let product = await Product.findById(productId);
     let productData = null;
     if (!product) {
       // Product not found in DB, add with price 0
@@ -72,14 +65,7 @@ const increaseQuantity = async (req, res) => {
 
 const decreaseQuantity = async (req, res) => {
   try {
-    const authHeader =
-      req.header("Authorization") || req.header("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({ error: "No token provided" });
-    }
-    const token = authHeader.replace("Bearer ", "");
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id;
+    const userId = req.user.id;
     const { productId } = req.body;
     if (!productId) {
       return res.status(400).json({ error: "productId is required" });
