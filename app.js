@@ -32,10 +32,10 @@ app.get("/", (_, res) => {
 });
 
 app.use("/auth", authRoutes);
-app.use("/users", authenticateToken, userRoutes);
-app.use("/products", authenticateToken, productRoutes);
-app.use("/cart", authenticateToken, cartRoutes);
-app.use("/categories", authenticateToken, categoryRoutes);
+app.use("/users", /*authenticateToken, */ userRoutes);
+app.use("/products", /*authenticateToken, */ productRoutes);
+app.use("/cart", /*authenticateToken, */ cartRoutes);
+app.use("/categories", /*authenticateToken, */ categoryRoutes);
 
 // Export for Vercel serverless
 module.exports = app;
