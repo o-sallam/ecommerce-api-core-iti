@@ -5,14 +5,24 @@ const jwt = require("jsonwebtoken");
 
 const login = async ({ body: { username, email, password } }, res) => {
   try {
-    // Find user by username or email and populate cart
-    const user = await User.findOne({
-      $or: [
-        username ? { username } : {},
-        email ? { email } : {}
-      ]
-    })
-      .select("-password") // Exclude password from the result
+    // Validate input
+    if (!username && !email) {
+      return res.status(400).json({ message: "Username or email is required" });
+    }
+
+    // Build query based on provided fields
+    let query = {};
+    if (username && email) {
+      query = { $or: [{ username }, { email }] };
+    } else if (username) {
+      query = { username };
+    } else if (email) {
+      query = { email };
+    }
+
+    // Find user and populate cart (fetch password for authentication)
+    const user = await User.findOne(query)
+      .select("+password") // Explicitly include password for authentication
       .populate("cart", "items total"); // Populate cart details
 
     if (!user) {
@@ -24,6 +34,9 @@ const login = async ({ body: { username, email, password } }, res) => {
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
+
+    // Remove password before sending user data
+    user.password = undefined;
 
     // Generate JWT token
     const token = jwt.sign(
