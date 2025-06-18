@@ -38,4 +38,3 @@ app.use("/categories", categoryRoutes);
 
 // Export for Vercel serverless
 module.exports = app;
-module.exports.handler = (req, res) => app(req, res);
