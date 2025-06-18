@@ -1,8 +1,26 @@
 const Cart = require("../models/cart.model");
+const jwt = require("jsonwebtoken");
 
 const increaseQuantity = async (req, res) => {
   try {
-    const { userId, productId } = req.body;
+    // Get token from Authorization header
+    const authHeader = req.headers["authorization"];
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ error: "No token provided" });
+    }
+    const token = authHeader.split(" ")[1];
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      return res.status(401).json({ error: "Invalid token" });
+    }
+    const userId = decoded.id;
+    const { productId } = req.body;
+    if (!productId) {
+      return res.status(400).json({ error: "productId is required" });
+    }
+
     let cartItem = await Cart.findOne({ userId, productId });
 
     if (cartItem) {
