@@ -11,6 +11,10 @@ const categorySchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  image: {
+    type: String,
+    default: "",
+  },
   products: [
     {
       type: mongoose.Schema.Types.ObjectId,

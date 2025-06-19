@@ -32,7 +32,8 @@ const endpointMap = {
   },
   "Categories": {
     "GET /categories": "Get all categories.",
-    "POST /categories": "Create a new category."
+    "POST /categories": "Create a new category.",
+    "PUT /categories/:id": "Update a category by ID. Expects {name, description, image} in body."
   }
 };
 

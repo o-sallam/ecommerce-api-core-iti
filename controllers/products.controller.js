@@ -94,7 +94,7 @@ const addBulkProducts = async (req, res) => {
 // READ
 //==================================================
 
-const { normalizeCategoryName } = require('../utils/stringHelpers');
+const { normalizeCategoryName } = require("../utils/stringHelpers");
 
 // Get products by category name
 const getProductsByCategoryName = async (req, res) => {
@@ -107,9 +107,13 @@ const getProductsByCategoryName = async (req, res) => {
     const normalized = normalizeCategoryName(rawName);
     // Find all categories, then match normalized
     const categories = await Category.find();
-    const matchedCategory = categories.find(cat => normalizeCategoryName(cat.name) === normalized);
+    const matchedCategory = categories.find(
+      (cat) => normalizeCategoryName(cat.name) === normalized
+    );
     if (!matchedCategory) {
-      return res.status(404).json({ message: `Category '${rawName}' not found` });
+      return res
+        .status(404)
+        .json({ message: `Category '${rawName}' not found` });
     }
     const productsList = await product.find({ category: matchedCategory._id });
     return res.status(200).json(productsList);

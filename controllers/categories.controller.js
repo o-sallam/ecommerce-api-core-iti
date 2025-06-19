@@ -14,7 +14,7 @@ const { toPascalCase } = require('../utils/stringHelpers');
 
 exports.createCategory = async (req, res) => {
   try {
-    let { name, description } = req.body;
+    let { name, description, image } = req.body;
     const pascalName = toPascalCase(name);
 
     // Check for existing category by normalized name (case and space insensitive)
@@ -25,12 +25,38 @@ exports.createCategory = async (req, res) => {
       return res.status(400).json({ message: 'Category already exists' });
     }
 
-    const category = new Category({ name: pascalName, description });
+    const category = new Category({ name: pascalName, description, image });
     await category.save();
 
     res.status(201).json(category);
   } catch (error) {
     console.error('Error creating category:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Edit (update) category by id
+exports.editCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, description, image } = req.body;
+    const update = {};
+    if (name) update.name = name;
+    if (description) update.description = description;
+    if (image) update.image = image;
+
+    const updatedCategory = await Category.findByIdAndUpdate(
+      id,
+      { $set: update },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedCategory) {
+      return res.status(404).json({ message: 'Category not found' });
+    }
+    res.json(updatedCategory);
+  } catch (error) {
+    console.error('Error updating category:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
