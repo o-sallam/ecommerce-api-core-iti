@@ -94,6 +94,30 @@ const addBulkProducts = async (req, res) => {
 // READ
 //==================================================
 
+const { normalizeCategoryName } = require('../utils/stringHelpers');
+
+// Get products by category name
+const getProductsByCategoryName = async (req, res) => {
+  try {
+    const rawName = req.params.categoryName || req.query.categoryName;
+    if (!rawName) {
+      return res.status(400).json({ message: "Category name is required" });
+    }
+    // Normalize input for regex: ignore case and spaces
+    const normalized = normalizeCategoryName(rawName);
+    // Find all categories, then match normalized
+    const categories = await Category.find();
+    const matchedCategory = categories.find(cat => normalizeCategoryName(cat.name) === normalized);
+    if (!matchedCategory) {
+      return res.status(404).json({ message: `Category '${rawName}' not found` });
+    }
+    const productsList = await product.find({ category: matchedCategory._id });
+    return res.status(200).json(productsList);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 // Get all products
 const getAllProducts = async (req, res) => {
   try {
@@ -286,6 +310,7 @@ module.exports = {
   getFeaturedProducts,
   getSingleProduct,
   getRelatedProducts,
+  getProductsByCategoryName,
   // UPDATE
   updateProduct,
   updateBulkProducts,

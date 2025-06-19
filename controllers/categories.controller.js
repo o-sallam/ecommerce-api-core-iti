@@ -10,16 +10,22 @@ exports.getAllCategories = async (req, res) => {
   }
 };
 
+const { toPascalCase } = require('../utils/stringHelpers');
+
 exports.createCategory = async (req, res) => {
   try {
-    const { name, description } = req.body;
+    let { name, description } = req.body;
+    const pascalName = toPascalCase(name);
 
-    const existingCategory = await Category.findOne({ name });
+    // Check for existing category by normalized name (case and space insensitive)
+    const existingCategory = await Category.findOne({
+      name: { $regex: `^${pascalName.replace(/ /g, '[\\s]*')}$`, $options: 'i' }
+    });
     if (existingCategory) {
       return res.status(400).json({ message: 'Category already exists' });
     }
 
-    const category = new Category({ name, description });
+    const category = new Category({ name: pascalName, description });
     await category.save();
 
     res.status(201).json(category);

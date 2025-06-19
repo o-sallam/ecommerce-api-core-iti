@@ -11,6 +11,7 @@ const endpointMap = {
   },
   "Products": {
     "GET /products": "Get all products.",
+    "GET /products/category/:categoryName": "Get all products by category name. Expects :categoryName as a route parameter (e.g., /products/category/Electronics). Returns an array of products in the specified category.",
     "GET /products/:id": "Get a single product by ID.",
     "GET /products/related/:id": "Get products related to a product by ID.",
     "GET /products/featured": "Get all featured products.",
