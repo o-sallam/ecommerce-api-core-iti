@@ -31,6 +31,10 @@ const userSchema = new mongoose.Schema({
   cart: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Cart'
+  },
+   wishlist: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Wishlist'
   }
 }, {
   timestamps: true,

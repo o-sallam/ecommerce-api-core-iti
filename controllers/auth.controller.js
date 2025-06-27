@@ -1,5 +1,6 @@
 const User = require("../models/user.model");
 const Cart = require("../models/cart.model");
+const Wishlist = require("../models/wishlist.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -21,9 +22,12 @@ const login = async ({ body: { username, email, password } }, res) => {
     }
 
     // Find user and populate cart (fetch password for authentication)
-    const user = await User.findOne(query)
-      .select("+password") // Explicitly include password for authentication
-      .populate("cart", "items total"); // Populate cart details
+const user = await User.findOne(query)
+  .select("+password")
+  .populate([
+    { path: "cart", select: "items total" },
+    { path: "wishlist", select: "items totalItems" }
+  ]);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -93,13 +97,25 @@ const register = async (req, res) => {
       user: user._id,
       items: [],
       total: 0,
+      totalItems: 0,
     });
 
     // Save cart
     await cart.save();
 
+        // Create a new wishlist for the user
+    const wishlist = new Wishlist({
+      user: user._id,
+      items: [],
+      totalItems: 0,
+    });
+
+    // Save wishlist
+    await wishlist.save();
+
     // Update user with cart reference
     user.cart = cart._id;
+    user.wishlist = wishlist._id;
     await user.save();
 
     // Generate JWT token
