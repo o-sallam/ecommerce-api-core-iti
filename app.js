@@ -9,6 +9,7 @@ const userRoutes = require("./routes/user.routes");
 const productRoutes = require("./routes/products.routes");
 const cartRoutes = require("./routes/cart.routes");
 const categoryRoutes = require("./routes/categories.routes");
+const wishlistRoutes = require("./routes/wishlist.routes");
 const endpointMap = require("./utils/endpointMap");
 const authenticateToken = require("./controllers/auth.middleware");
 
@@ -37,6 +38,7 @@ app.use("/users", authenticateToken, userRoutes);
 app.use("/products", productRoutes);
 app.use("/cart", authenticateToken, cartRoutes);
 app.use("/categories", categoryRoutes);
+app.use("/wishlist", wishlistRoutes);
 
 // Export for Vercel serverless
 module.exports = app;

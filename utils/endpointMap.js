@@ -34,6 +34,14 @@ const endpointMap = {
     "GET /categories": "Get all categories.",
     "POST /categories": "Create a new category.",
     "PUT /categories/:id": "Update a category by ID. Expects {name, description, image} in body."
+  },
+    "Wishlist": {
+    "GET /wishlist": "Get the authenticated user's wishlist. Requires JWT token in Authorization header as 'Bearer <token>'.",
+    "POST /wishlist/add": "Add a product to the authenticated user's wishlist. Requires JWT token in Authorization header and {productId} in body.",
+    "DELETE /wishlist/remove": "Remove a product from the authenticated user's wishlist. Requires JWT token in Authorization header and {productId} in body.",
+    "DELETE /wishlist/clear": "Clear all items from the authenticated user's wishlist. Requires JWT token in Authorization header.",
+    "GET /wishlist/check/:productId": "Check if a product is in the authenticated user's wishlist. Requires JWT token in Authorization header.",
+    "GET /wishlist/admin/all": "[ADMIN ONLY] Get all wishlists."
   }
 };
 
