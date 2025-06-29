@@ -59,7 +59,7 @@ const endpointMap = {
   },
   Orders: {
     "POST /orders/confirm":
-      "Confirm order submission. Requires JWT token in Authorization header. Expects {shippingAddress, paymentMethod, paymentDetails?, items, total, notes?} in body. Returns {ok, remainingDays, orderId, message}.",
+      "Confirm order submission. Requires JWT token in Authorization header. Expects {shippingAddress: {firstName, lastName, email, phone, address, city, country, zipCode}, paymentMethod, items: [{productId, quantity, price}], total, notes?} in body. Returns {ok, remainingDays, orderId, message}.",
     "GET /orders":
       "Get the authenticated user's orders. Requires JWT token in Authorization header as 'Bearer <token>'.",
     "GET /orders/:orderId":

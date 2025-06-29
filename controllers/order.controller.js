@@ -25,12 +25,61 @@ exports.confirmOrder = async (req, res) => {
       });
     }
 
+    // Validate shipping address fields
+    const requiredAddressFields = [
+      "firstName",
+      "lastName",
+      "email",
+      "phone",
+      "address",
+      "city",
+      "country",
+      "zipCode",
+    ];
+    const missingAddressFields = requiredAddressFields.filter(
+      (field) => !shippingAddress[field]
+    );
+
+    if (missingAddressFields.length > 0) {
+      return res.status(400).json({
+        ok: false,
+        message: `Missing shipping address fields: ${missingAddressFields.join(
+          ", "
+        )}`,
+      });
+    }
+
     // Validate items array
     if (!Array.isArray(items) || items.length === 0) {
       return res.status(400).json({
         ok: false,
         message: "Items must be a non-empty array",
       });
+    }
+
+    // Validate each item has required fields
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (!item.productId || !item.quantity || !item.price) {
+        return res.status(400).json({
+          ok: false,
+          message: `Item at index ${i} is missing required fields: productId, quantity, and price are required`,
+        });
+      }
+
+      if (item.quantity <= 0) {
+        return res.status(400).json({
+          ok: false,
+          message: `Item at index ${i} has invalid quantity: must be greater than 0`,
+        });
+      }
+
+      if (item.price <= 0) {
+        return res.status(400).json({
+          ok: false,
+          message: `Item at index ${i} has invalid price: must be greater than 0`,
+        });
+      }
     }
 
     // Validate total amount
